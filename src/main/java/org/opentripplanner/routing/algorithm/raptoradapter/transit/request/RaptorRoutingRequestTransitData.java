@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -29,6 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 
 /**
@@ -69,13 +71,16 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   private final int validTransitDataEndTime;
 
+  private final BitSet bannedStopsHard;
+
   public RaptorRoutingRequestTransitData(
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     TransitDataProviderFilter filter,
-    RouteRequest request
+    RouteRequest request,
+    Set<FeedScopedId> bannedStopsHard
   ) {
     this.transferService = transitLayer.getTransferService();
     this.transitLayer = transitLayer;
@@ -124,6 +129,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         this.transitSearchTimeZero,
         this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
       );
+    this.bannedStopsHard = transitDataCreator.createBannedStopSet(bannedStopsHard);
   }
 
   @Override
@@ -240,5 +246,15 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
+  }
+
+  @Override
+  public boolean isStopHardBanned(int index) {
+    return bannedStopsHard.get(index);
+  }
+
+  @Override
+  public BitSet getHardBannedStops() {
+    return bannedStopsHard;
   }
 }

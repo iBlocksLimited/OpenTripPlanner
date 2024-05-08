@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor;
 
+import java.util.BitSet;
 import java.util.Collection;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
@@ -191,6 +192,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       IntIterator stops = state.stopsTouchedPreviousRound();
       IntIterator routeIndexIterator = transitData.routeIndexIterator(stops);
 
+      BitSet stopBitSet = state.stopsTouchedPreviousRoundAsBitSet();
       while (routeIndexIterator.hasNext()) {
         var routeIndex = routeIndexIterator.next();
         var route = transitData.getRouteForIndex(routeIndex);
@@ -206,9 +208,19 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
         IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
 
+        boolean foundStopTouchedInPreviousRound = false;
         while (stop.hasNext()) {
           int stopPos = stop.next();
           int stopIndex = pattern.stopIndex(stopPos);
+
+          if (!stopBitSet.get(stopIndex) && !foundStopTouchedInPreviousRound) {
+            continue;
+          }
+          foundStopTouchedInPreviousRound = true;
+          if (transitData.isStopHardBanned(stopIndex)) {
+            foundStopTouchedInPreviousRound = false;
+            continue;
+          }
 
           transitWorker.prepareForNextStop(stopIndex, stopPos);
 
@@ -251,9 +263,16 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
       while (it.hasNext()) {
         final int fromStop = it.next();
+        if (transitData.isStopHardBanned(fromStop)) {
+          break;
+        }
         // no need to consider loop transfers, since we don't mark patterns here any more
         // loop transfers are already included by virtue of those stops having been reached
-        state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
+        state.transferToStops(
+          fromStop,
+          calculator.getTransfers(transitData, fromStop),
+          transitData.getHardBannedStops()
+        );
       }
 
       lifeCycle.transfersForRoundComplete();

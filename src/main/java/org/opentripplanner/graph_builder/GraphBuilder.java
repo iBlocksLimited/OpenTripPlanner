@@ -135,8 +135,13 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(factory.areaStopsToVerticesMapper());
       }
 
+      // NOTE: in v2.1.0, you could provide the config value 'useTransfersTxt' in the
+      // build-config.json file, and it would prevent OTP from generating its own transfers. This
+      // feature was removed in a later version and so to simulate the previous behaviour, we have
+      // commented out the below line of code.
+
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-      graphBuilder.addModule(factory.directTransferGenerator());
+      // graphBuilder.addModule(factory.directTransferGenerator());
 
       // Analyze routing between stops to generate report
       if (OTPFeature.TransferAnalyzer.isOn()) {

@@ -311,7 +311,8 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       new RouteRequestTransitDataProviderFilter(request),
-      request
+      request,
+      request.journey().transit().bannedStopsHard()
     );
   }
 

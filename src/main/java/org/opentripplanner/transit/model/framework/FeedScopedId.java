@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,6 +61,10 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   public static List<FeedScopedId> parseList(String s) {
     return Arrays.stream(s.split(",")).map(FeedScopedId::parse).collect(Collectors.toList());
+  }
+
+  public static Set<FeedScopedId> parseSet(String s) {
+    return Arrays.stream(s.split(",")).map(FeedScopedId::parse).collect(Collectors.toSet());
   }
 
   public static boolean isValidString(String value) throws IllegalArgumentException {

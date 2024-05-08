@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
+import java.util.BitSet;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -150,4 +151,18 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * REVERSE search.
    */
   RaptorConstrainedBoardingSearch<T> transferConstraintsReverseSearch(int routeIndex);
+
+  /**
+   * Checks whether a given stop id is within the the set of hard banned stops to not allow travel
+   * through.
+   *
+   * @param index stop id within a pattern
+   * @return true if the stop is hard banned, false otherwise.
+   */
+  boolean isStopHardBanned(int index);
+
+  /**
+   * Gets a the {@link BitSet} of the hard banned stops
+   */
+  BitSet getHardBannedStops();
 }

@@ -153,6 +153,10 @@ public final class BestTimes {
       .toString();
   }
 
+  public BitSet stopsReachedLastRoundAsBitSet() {
+    return reachedLastRound;
+  }
+
   /**
    * @return true if the given stop was reached by on-board in the current round.
    */

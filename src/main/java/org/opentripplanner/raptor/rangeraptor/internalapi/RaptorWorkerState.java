@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
+import java.util.BitSet;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -43,7 +44,13 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
   /**
    * Update state with a new transfer.
    */
-  void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
+  void transferToStops(
+    int fromStop,
+    Iterator<? extends RaptorTransfer> transfers,
+    BitSet bannedStopsHard
+  );
 
   RaptorWorkerResult<T> results();
+
+  BitSet stopsTouchedPreviousRoundAsBitSet();
 }

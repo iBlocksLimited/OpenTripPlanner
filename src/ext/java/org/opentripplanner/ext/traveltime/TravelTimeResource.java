@@ -129,7 +129,8 @@ public class TravelTimeResource {
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RouteRequestTransitDataProviderFilter(routingRequest),
-        routingRequest
+        routingRequest,
+        routingRequest.journey().transit().bannedStopsHard()
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());

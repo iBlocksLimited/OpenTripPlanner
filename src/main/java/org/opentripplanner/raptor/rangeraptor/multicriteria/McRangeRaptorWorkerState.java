@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -101,11 +102,18 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
    * Set the time at a transit stops iff it is optimal.
    */
   @Override
-  public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+  public void transferToStops(
+    int fromStop,
+    Iterator<? extends RaptorTransfer> transfers,
+    BitSet bannedStopsHard
+  ) {
     var fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
 
     while (transfers.hasNext()) {
-      transferToStop(fromArrivals, transfers.next());
+      RaptorTransfer transfer = transfers.next();
+      if (!bannedStopsHard.get(transfer.stop())) {
+        transferToStop(fromArrivals, transfer);
+      }
     }
   }
 
@@ -113,6 +121,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   public RaptorWorkerResult<T> results() {
     arrivals.debugStateInfo();
     return new McRaptorWorkerResult<T>(arrivals, paths);
+  }
+
+  @Override
+  public BitSet stopsTouchedPreviousRoundAsBitSet() {
+    return arrivals.stopsTouched();
   }
 
   Iterable<? extends McStopArrival<T>> listStopArrivalsPreviousRound(int stop) {

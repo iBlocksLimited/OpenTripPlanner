@@ -780,6 +780,8 @@ public abstract class RoutingResource {
         // Filter Trips
         setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
 
+        setIfNotNull(bannedStopsHard, journey.transit()::setBannedStopsHardFromString);
+
         // Excluded entities
         setIfNotNull(
           bannedAgencies,

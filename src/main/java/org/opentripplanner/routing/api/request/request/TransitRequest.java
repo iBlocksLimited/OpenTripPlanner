@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.request;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
@@ -28,6 +29,9 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> preferredRoutes = List.of();
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
+
+  private Set<FeedScopedId> bannedStopsHard = Set.of();
+
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
   public void setBannedTripsFromString(String ids) {
@@ -98,6 +102,12 @@ public class TransitRequest implements Cloneable, Serializable {
     }
   }
 
+  public void setBannedStopsHardFromString(String s) {
+    if (!s.isEmpty()) {
+      this.bannedStopsHard = FeedScopedId.parseSet(s);
+    }
+  }
+
   @Deprecated
   public void setPreferredRoutes(List<FeedScopedId> preferredRoutes) {
     this.preferredRoutes = preferredRoutes;
@@ -136,6 +146,10 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public DebugRaptor raptorDebugging() {
     return raptorDebugging;
+  }
+
+  public Set<FeedScopedId> bannedStopsHard() {
+    return bannedStopsHard;
   }
 
   public TransitRequest clone() {

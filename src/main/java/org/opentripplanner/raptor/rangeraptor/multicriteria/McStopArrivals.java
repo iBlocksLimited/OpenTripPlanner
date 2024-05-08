@@ -84,6 +84,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::numberOfTransfers);
   }
 
+  public BitSet stopsTouched() {
+    return touchedStops;
+  }
+
   boolean updateExist() {
     return !touchedStops.isEmpty();
   }

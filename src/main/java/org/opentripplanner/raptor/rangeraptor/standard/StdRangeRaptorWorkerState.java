@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard;
 
+import java.util.BitSet;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -123,10 +124,17 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
    * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
    */
   @Override
-  public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+  public void transferToStops(
+    int fromStop,
+    Iterator<? extends RaptorTransfer> transfers,
+    BitSet bannedStopsHard
+  ) {
     int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
     while (transfers.hasNext()) {
-      transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+      RaptorTransfer transfer = transfers.next();
+      if (!bannedStopsHard.get(transfer.stop())) {
+        transferToStop(arrivalTimeTransit, fromStop, transfer);
+      }
     }
   }
 
@@ -215,6 +223,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
       stopArrivalsState::extractPaths,
       bestNumberOfTransfers::extractBestNumberOfTransfers
     );
+  }
+
+  @Override
+  public BitSet stopsTouchedPreviousRoundAsBitSet() {
+    return bestTimes.stopsReachedLastRoundAsBitSet();
   }
 
   /* private methods */

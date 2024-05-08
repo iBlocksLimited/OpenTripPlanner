@@ -9,16 +9,21 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,23 @@ class RaptorRoutingRequestTransitDataCreator {
     this.transitLayer = transitLayer;
     this.departureDate = ServiceDateUtils.asServiceDay(transitSearchTimeZero);
     this.transitSearchTimeZero = transitSearchTimeZero;
+  }
+
+  /**
+   * Takes the set of {@link FeedScopedId}s and converts them to their stop indexes
+   *
+   * @param bannedStopsHard list of hard banned stops
+   * @return the stop indexes of the hard banned stops
+   */
+  BitSet createBannedStopSet(Set<FeedScopedId> bannedStopsHard) {
+    BitSet bannedStopsHardBitSet = new BitSet(bannedStopsHard.size());
+    bannedStopsHard
+      .stream()
+      .map(transitLayer::getIndexOfRegularStop)
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .forEach(bannedStopsHardBitSet::set);
+    return bannedStopsHardBitSet;
   }
 
   public List<int[]> createTripPatternsPerStop(List<TripPatternForDates> tripPatternsForDate) {

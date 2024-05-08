@@ -192,6 +192,16 @@ public class TestTransitData
     return getRoute(routeIndex).transferConstraintsReverseSearch();
   }
 
+  @Override
+  public boolean isStopHardBanned(int index) {
+    return false;
+  }
+
+  @Override
+  public BitSet getHardBannedStops() {
+    return null;
+  }
+
   public TestRoute getRoute(int index) {
     return routes.get(index);
   }

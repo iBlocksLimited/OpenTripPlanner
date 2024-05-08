@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
@@ -14,6 +15,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
@@ -92,6 +95,12 @@ public class TransitLayer {
   @Nullable
   public StopLocation getStopByIndex(int stop) {
     return stop == -1 ? null : this.stopModel.stopByIndex(stop);
+  }
+
+  public Optional<Integer> getIndexOfRegularStop(FeedScopedId regularStopFeedScopedId) {
+    return Optional
+      .ofNullable(this.stopModel.getRegularStop(regularStopFeedScopedId))
+      .map(RegularStop::getIndex);
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
